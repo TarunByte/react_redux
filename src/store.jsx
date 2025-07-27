@@ -19,7 +19,7 @@ const askReducer = (state = initialState, action) => {
       });
       return {
         ...state,
-        task: [...state.task, updatedTask],
+        task: updatedTask,
       };
 
     default:
