@@ -1,9 +1,27 @@
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { MdDeleteForever } from "react-icons/md";
+import { useState } from "react";
+import { addTask, deleteTask } from "../store";
 
 export const Todo = () => {
+  const [task, setTask] = useState("");
+
   const tasks = useSelector((state) => state.task);
   // console.log("react states", state.task);
+
+  const dispatch = useDispatch();
+
+  // handle handleFormSubmit
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    dispatch(addTask(task));
+    return setTask("");
+  };
+
+  // handle handleTaskDelete
+  const handleTaskDelete = (id) => {
+    return dispatch(deleteTask(id));
+  };
 
   return (
     <div className="container">
@@ -12,8 +30,14 @@ export const Todo = () => {
           <i className="fa-regular fa-pen-to-squer"></i>To-do List:
         </h1>
         <div className="row">
-          <form>
-            <input type="text" id="input-box" placeholder="Add a new task" />
+          <form onSubmit={handleFormSubmit}>
+            <input
+              type="text"
+              id="input-box"
+              placeholder="Add a new task"
+              value={task}
+              onChange={(e) => setTask(e.target.value)}
+            />
             <button>Add Task</button>
           </form>
         </div>
