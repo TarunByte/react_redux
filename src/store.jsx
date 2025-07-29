@@ -31,13 +31,22 @@ const taskReducer = (state = initialState, action) => {
 };
 
 // Step 2: Create the Redux store using the reducer
-const store = createStore(taskReducer);
+export const store = createStore(taskReducer);
 console.log(store);
 
 // Step 3: Log the initial state
 // The getState method is a synchronous function that returns the current state of a Redux application. It includes the entire state of the application, including all the reducers and their respective states.
 
 console.log("inital State", store.getState());
+
+// step 5: Create action creators
+const addTask = (data) => {
+  return { type: ADD_TASK, payload: data };
+};
+
+const deleteTask = (id) => {
+  return { type: DELETE_TASK, payload: id };
+};
 
 // Step 4: Dispatch an action to add a task
 store.dispatch(addTask("Buy TT code"));
@@ -50,12 +59,3 @@ console.log("updated State", store.getState());
 // store.dispatch({ type: DELETE_TASK, payload: 1 });
 store.dispatch(deleteTask(1));
 console.log("deleted State", store.getState());
-
-// step 5: Create action creators
-const addTask = (data) => {
-  return { type: ADD_TASK, payload: data };
-};
-
-const deleteTask = (id) => {
-  return { type: DELETE_TASK, payload: id };
-};
