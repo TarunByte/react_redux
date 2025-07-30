@@ -1,13 +1,14 @@
-import { createStore } from "redux";
+import { applyMiddleware, createStore } from "redux";
 import { composeWithDevTools } from "@redux-devtools/extension";
+import { thunk } from "redux-thunk";
 
 // Define Action Types: stateDomain & the Event
 const ADD_TASK = "task/add";
 const DELETE_TASK = "task/delete";
+const FETCH_TASKS = "task/fetch";
 
 const initialState = {
   task: [],
-  isLoading: false,
 };
 
 //Step 1: Create a simple reducer function
@@ -28,22 +29,41 @@ const taskReducer = (state = initialState, action) => {
         task: updatedTask,
       };
 
+    case FETCH_TASKS:
+      return {
+        ...state,
+        task: [...state.task, ...action.payload],
+      };
+
     default:
       return state;
   }
 };
 
 // Step 2: Create the Redux store using the reducer
-export const store = createStore(taskReducer, composeWithDevTools());
+export const store = createStore(
+  taskReducer,
+  composeWithDevTools(applyMiddleware(thunk))
+);
 console.log(store);
 
 // Step 3: Log the initial state
 // The getState method is a synchronous function that returns the current state of a Redux application. It includes the entire state of the application, including all the reducers and their respective states.
+store.dispatch({ type: ADD_TASK, payload: "Buy Apple" });
+console.log("Updated State:", store.getState());
 
-console.log("inital State", store.getState());
+store.dispatch({ type: ADD_TASK, payload: "Buy Mango" });
+console.log("Updated State:", store.getState());
+
+store.dispatch({ type: ADD_TASK, payload: "Buy Banana" });
+console.log("Updated State:", store.getState());
+
+// store.dispatch(addTask("Buy Grapes"));
+// console.log("Updated State:", store.getState());
 
 // step 5: Create action creators
 export const addTask = (data) => {
+  console.log("add task calling");
   return { type: ADD_TASK, payload: data };
 };
 
@@ -51,16 +71,21 @@ export const deleteTask = (id) => {
   return { type: DELETE_TASK, payload: id };
 };
 
-// Step 4: Dispatch an action to add a task
-store.dispatch(addTask("Buy TT code"));
-store.dispatch(addTask("Buy apple"));
-store.dispatch(addTask("Buy banana"));
-console.log("updated State", store.getState());
+export const fetchTask = () => {
+  return async (dispatch) => {
+    try {
+      const res = await fetch(
+        "https://jsonplaceholder.typicode.com/todos?_limit=3"
+      );
+      const task = await res.json();
+      console.log(task);
 
-// store.dispatch({ type: ADD_TASK, payload: "Buy Mango" });
-store.dispatch(addTask("Buy Mango"));
-console.log("updated State", store.getState());
-
-// store.dispatch({ type: DELETE_TASK, payload: 1 });
-store.dispatch(deleteTask(1));
-console.log("deleted State", store.getState());
+      dispatch({
+        type: FETCH_TASKS,
+        payload: task.map((curTask) => curTask.title),
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+};

@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { MdDeleteForever } from "react-icons/md";
 import { useState } from "react";
-import { addTask, deleteTask } from "../store";
+import { addTask, deleteTask, fetchTask } from "../store";
 
 export const Todo = () => {
   const [task, setTask] = useState("");
@@ -10,17 +10,24 @@ export const Todo = () => {
   // console.log("react states", state.task);
 
   const dispatch = useDispatch();
+  console.log(tasks);
 
-  // handle handleFormSubmit
+  // Handle form submission to add tasks
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    dispatch(addTask(task));
-    return setTask("");
+    if (task.trim()) {
+      dispatch(addTask(task)); // Dispatch the action to add a new task
+      setTask(""); // Clear input field after submission
+    }
   };
 
   // handle handleTaskDelete
   const handleTaskDelete = (id) => {
     return dispatch(deleteTask(id));
+  };
+
+  const handleFetchTasks = () => {
+    dispatch(fetchTask()); // Fetch tasks from the API
   };
 
   return (
@@ -41,6 +48,9 @@ export const Todo = () => {
             <button>Add Task</button>
           </form>
         </div>
+
+        <button onClick={handleFetchTasks}>Fetch Tasks</button>
+
         <ul id="list-container">
           {tasks.map((curTask, index) => {
             return (
